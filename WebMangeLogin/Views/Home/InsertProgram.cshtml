@@ -1,0 +1,75 @@
+﻿
+<div class="container ">
+    <form asp-controller="Home" asp-action="InsertProToDB" method="POST">
+        <div class="card card-dark mt-3">
+            <div class="card-header ">
+                <h2 class="text-center">Insert Program</h2>
+            </div>
+
+
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="emp_name" class="form-label">Program Name</label>
+                    <input type="text" class="form-control" id="PgName" name="PgName" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<!--Script-->
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+@* Start ajax get message from method  *@
+<script>
+    $(document).ready(function () {
+        $('form').submit(function (event) {
+            event.preventDefault();
+            var form = $(this);
+
+            $.ajax({
+                url: form.attr('action'),
+                method: form.attr('method'),
+                data: form.serialize(),
+                success: function (response) {
+                    if (response.success) {
+                        $('button[type="submit"]').prop('disabled', true);
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: response.message
+                        }).then((result) => {
+                             if (result.isConfirmed) {
+                                    window.location.href = '@Url.Action("ManageProgram", "Home")';
+                                } else {
+                                    window.location.href = '@Url.Action("ManageProgram", "Home")';
+
+                                }
+                           
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.message
+                        });
+                    }
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while processing your request.'
+                    });
+                }
+            });
+        });
+    });
+</script>
+@* End ajax get message from method  *@
+
+

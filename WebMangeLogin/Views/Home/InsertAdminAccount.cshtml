@@ -1,0 +1,173 @@
+﻿@model User
+<div class="container ">
+
+    <form asp-controller="Home" asp-action="InsertAccToDB" method="POST">
+        <div class="card card-dark mt-3">
+            <div class="card-header ">
+                <h2 class="  text-center">Insert Non-Employee </h2>
+            </div>
+            <div class="card-body">
+                <div class="mb-3 d-none"  >
+                    <label for="EmpId" class="form-label">EmpId</label>
+                    <input type="text" class="form-control" id="EmpId" name="EmpId" value="0">
+                </div> 
+
+                <div class="mb-3">
+                    <label for="Username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="Username" name="Username">
+                </div>
+
+
+                <div class="mb-3">
+                    <label for="Password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="Password" name="Password" required>
+                </div>
+
+
+                <div class="input-group mb-3">
+                    <a class="text-primary toggle-form"><i class="fa-solid fa-circle-chevron-down me-1"></i></a>
+                </div>
+                <div class="toggleable ">
+                    <div class="card">
+                        <div class="card-body">
+                            <table class="table table-hover ">
+                                <thead class="table-dark ">
+                                    <tr class="text-center">
+                                        <th>ProgramName</th>
+                                        <th class="d-none">Confirm</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+
+
+                                <tbody>
+
+
+                                    @foreach (var item in Model.Programs)
+                                    {
+                                        <tr class="text-center">
+
+                                            <td>
+                                                @item.PgName
+                                            </td>
+                                            <td class="d-none">
+                                                <div class="form-check  ">
+                                                    <input class="form-check-input" type="checkbox" id="PgId" name="PgId[]" value="@item.PgId">
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="form-check form-switch ">
+                                                    <input class="form-check-input" type="checkbox" id="AccStatus" name="AccStatus[]" value="1">
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+
+                                </tbody>
+
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+
+<!--Script-->
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+@* Start ajax get message from method  *@
+<script>
+    $(document).ready(function () {
+        $('form').submit(function (event) {
+            event.preventDefault();
+            var form = $(this);
+
+            $.ajax({
+                url: form.attr('action'),
+                method: form.attr('method'),
+                data: form.serialize(),
+                success: function (response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: response.message
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = '@Url.Action("manageAdminAccount", "Home")';
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.message
+                        });
+                    }
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while processing your request.'
+                    });
+                }
+            });
+        });
+    });
+</script>
+@* End ajax get message from method  *@
+
+
+
+
+<script>
+    $(document).ready(function () {
+        $('input[name="AccStatus[]"]').change(function () {
+            var isChecked = $(this).prop("checked");
+            var row = $(this).closest("tr");
+            var pgIdCheckbox = row.find('input[name="PgId[]"]');
+            pgIdCheckbox.prop("checked", isChecked);
+        });
+    });
+
+</script>
+
+@* Start togger program*@
+<script>
+    $(document).ready(function () {
+        $(".toggle-form").click(function () {
+            $(".toggleable").toggle(500);
+        });
+    });
+</script>
+@* End togger program*@
+
+
+@* Start autocomplete *@
+<script>
+    $(function () {
+        //Initialize Select2 Elements
+        $('.select2').select2()
+
+        //Initialize Select2 Elements
+        $('.select2bs4').select2({
+            theme: 'bootstrap4'
+        })
+
+    })
+
+</script>
+@* End autocomplete *@
+
+
+
+
+

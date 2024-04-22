@@ -1,0 +1,143 @@
+﻿
+
+<div class="container mt-3 ">
+    <div class="card">
+        <div class="card-header  bg-lightblue ">
+            <div>
+                <h2 class="text-center">Employee</h2>
+            </div>
+            <div class="row">
+                <div class=" d-flex  flex-wrap  justify-content-end mb-3 gap-2">
+                   <form asp-controller="Home" asp-action="Summary" method="get">
+                        <div class="input-group ">
+                                <select class="form-select select2bs4" id="searchProgram" name="searchProgram" >
+                                <option value="">Select a program...</option>
+                                    @foreach (var item in Model.ProgramModels)
+                                    {
+                                        <option value="@item.PgId">@item.PgName</option>
+                                    }
+                                </select>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </button>
+                            </div>
+                   </form>
+
+                    <a asp-controller="Home" asp-action="ManageInsertAccount" class="btn btn-outline-light  " style="border-width: 2px; "><i class="fa-solid fa-plus me-2 "></i>Employee Account</a>
+                    <a asp-controller="Recycle" asp-action="ManageRecycleAccount" class="btn btn-outline-warning  " style="border-width: 2px;"><i class="fa-solid fa-recycle "></i></a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col  mb-3">
+                    <form asp-controller="Home" asp-action="Summary" method="get">
+                        <div class="input-group  text-dark">
+                            <input type="text" class="form-control text-dark" placeholder="Search..." name="searchQuery" value="@ViewBag.SearchQuery">
+                            <div class="input-group-append">
+                                <button type="submit" class="btn btn-warning">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+        <div id="tablelogin">
+        <partial name="TableLogin"></partial>
+        </div>
+
+        <!-- /.card-header -->
+       @*  <div class="card-body table-responsive p-0  ">
+            @if (Model.Logins != null && Model.Logins.Count > 0) // ตรวจสอบว่ามีข้อมูลในตารางหรือไม่
+            {
+                <table class="table table-striped table-hover ">
+                    <caption class="caption-bottom ps-2 text-bold">
+                        @(Model.ItemsPerPage * (Model.CurrentPage - 1) + 1) - @(Model.ItemsPerPage * (Model.CurrentPage - 1) + Model.Logins.Count) of @(Model.TotalItems)
+                    </caption>
+                    <thead>
+                        <tr class="text-start">
+                            <th class="text-start">No.</th>
+                            <th>Username</th>
+                            <th>Name</th>
+                            <th>Position</th>
+                            <th class=" text-center col-1">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int startIndex = (Model.CurrentPage - 1) * Model.ItemsPerPage + 1; // คำนวณดัชนีเริ่มต้นของการนับ i
+                            int i = startIndex;
+
+
+                            @foreach (var item in Model.Logins)
+                            {
+                                <tr class="text-start">
+                                    <td>@i</td>
+                                    <td>@item.Username</td>
+                                    <td>@item.EmpName</td>
+                                    <td>@item.PosName</td>
+                                    <td class="text-center"><a class=" text-primary" asp-controller="Home" asp-action="UpdateAccount" asp-route-id="@item.LogId" asp-route-page="@Model.CurrentPage" asp-route-searchquery="@ViewBag.SearchQuery" asp-route-searchProgram="@ViewBag.SearchProgram"> <i class="fa-solid fa-pen-to-square fa-sm "></i></a></td>
+                                </tr>
+                                i++;
+                            }
+                        }
+
+
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="d-flex justify-content-center align-content-center pt-3 pb-3">
+                    <p class="display-6 text-secondary"><b>No data found</b></p>
+                </div>
+            }
+        </div> *@
+    </div>
+
+    <!-- Pagination -->
+    <partial name="_Pagination"></partial>
+</div>
+
+
+
+@* Start select2 auto complete *@
+<script>
+    $(function () {
+        //Initialize Select2 Elements
+        $('.select2').select2()
+
+        //Initialize Select2 Elements
+        $('.select2bs4').select2({
+            theme: 'bootstrap4'
+        })
+
+    })
+
+</script>
+@* End select2 auto complete *@
+
+<script>
+    // หา element select โดยใช้ id
+    var selectElementProId = document.getElementById('searchProgram');
+    // ค่า pos_id ของ Employee
+    var empProId = @ViewBag.SearchProgram
+
+    // วนลูปผ่านตัวเลือกทั้งหมดใน select
+    for (var i = 0; i < selectElementProId.options.length; i++) {
+        // ตรวจสอบว่า pos_id ของตัวเลือกตรงกับ pos_id ของ Employee หรือไม่
+        if (selectElementProId.options[i].value == empProId) {
+            // กำหนด selected attribute ให้กับตัวเลือกที่ตรงกัน
+            selectElementProId.options[i].selected = true;
+            // หยุดการวนลูปหากเจอการตรงค่า
+            break;
+        }
+    }
+ </script>
+
+
+
+
+
+

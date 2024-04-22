@@ -1,0 +1,335 @@
+﻿@model User
+<div class="container ">
+
+    <form asp-controller="Home" asp-action="InsertAccToDB" method="POST">
+        <div class="card card-dark mt-3">
+            <div class="card-header ">
+                <h2 class="  text-center">Insert Account</h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+
+                        <div class="form-group mb-3">
+                            <label for="" class="form-label">Department</label>
+                            <select class="form-select select2bs4" id="DepId" name="DepId" style="width:100%;">
+                                <option value="">Select a department...</option>
+                                @foreach (var item in Model.Departments)
+                                {
+                                    <option value="@item.DepId">@item.DepName</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group mb-3">
+                            <label for="" class="form-label">Position</label>
+                            <select class="form-control select2bs4" id="PosId" name="PosId" style="width:100%;" disabled>
+                                <option value="0">Select an Position...</option>
+                                <partial name="SelectPosition" model="Model.Positions"></partial>
+                            </select>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group mb-3">
+                            <label for="" class="form-label">Employee</label>
+                            <select class="form-control select2bs4" id="EmpId" name="EmpId" style="width:100%;" disabled>
+                                <option value="0">Select an Employee...</option>
+                                <partial name="SelectEmployee" model="Model.Employees"></partial>
+                            </select>
+                        </div>
+
+                    </div>
+                    <div class="col">
+                        <div class="mb-3">
+                            <label for="" class="form-label">Username</label>
+                            <select class="form-control" id="Username" name="Username" disabled>
+                                <option value="0">Select an EmpNumber...</option>
+                                <partial name="SelectEmpNumber" model="Model.Employees"></partial>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="Password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="Password" name="Password">
+                </div>
+
+
+                <div class="input-group mb-3">
+                    <a class="text-primary toggle-form"><i class="fa-solid fa-circle-chevron-down me-1"></i></a>
+                </div>
+                <div class="toggleable ">
+                    <div class="card">
+                        <div class="card-body">
+                            <table class="table table-hover ">
+                                <thead class="table-dark ">
+                                    <tr class="text-center">
+                                        <th>ProgramName</th>
+                                        <th class="d-none">Confirm</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+
+
+                                <tbody>
+
+
+                                    @foreach (var item in Model.Programs)
+                                    {
+                                        <tr class="text-center">
+
+                                            <td>
+                                                @item.PgName
+                                            </td>
+                                            <td class="d-none">
+                                                <div class="form-check  ">
+                                                    <input class="form-check-input" type="checkbox" id="PgId" name="PgId[]" value="@item.PgId">
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="form-check form-switch ">
+                                                    <input class="form-check-input" type="checkbox" id="AccStatus" name="AccStatus[]" value="1">
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+
+                                </tbody>
+
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+
+<!--Script-->
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+@* Start ajax get message from method  *@
+<script>
+    $(document).ready(function () {
+        $('form').submit(function (event) {
+            event.preventDefault();
+            var form = $(this);
+
+            $.ajax({
+                url: form.attr('action'),
+                method: form.attr('method'),
+                data: form.serialize(),
+                success: function (response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: response.message
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = '@Url.Action("Summary", "Home")';
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.message
+                        });
+                    }
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while processing your request.'
+                    });
+                }
+            });
+        });
+    });
+</script>
+@* End ajax get message from method  *@
+
+
+@* Start check DepName in Database  *@
+<script>
+    $(document).ready(function () {
+        $('#DepName').on('change', function () {
+            var dep_name = $(this).val(); // รับข้อมูล username จาก input field
+            $.ajax({
+                url: '@Url.Action("CheckDepNameExists", "Home")', // URL ของ Action ใน Controller
+                method: 'POST',
+                data: { dep_name: dep_name },
+                success: function (response) {
+                    if (response.dep_name_exists) {
+                        // แสดง SweetAlert ถ้า username ซ้ำ
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Department exists',
+                            text: 'This Department is already in use. Please choose another one.'
+                        }).then(function () {
+                            $('#DepName').val(''); // เคลียร์ค่าในช่อง username
+                        });
+                    }
+                },
+                error: function () {
+                    // แสดง SweetAlert ถ้าเกิดข้อผิดพลาด
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while processing your request.'
+                    });
+                }
+            });
+        });
+    });
+</script>
+@* End check DepName in Database  *@
+
+
+
+
+
+
+
+<script>
+    $(document).ready(function () {
+        $('input[name="AccStatus[]"]').change(function () {
+            var isChecked = $(this).prop("checked");
+            var row = $(this).closest("tr");
+            var pgIdCheckbox = row.find('input[name="PgId[]"]');
+            pgIdCheckbox.prop("checked", isChecked);
+        });
+    });
+
+</script>
+
+<script>
+    $(document).ready(function () {
+        $(".toggle-form").click(function () {
+            $(".toggleable").toggle(500);
+        });
+    });
+</script>
+
+
+
+<script>
+    $(function () {
+        //Initialize Select2 Elements
+        $('.select2').select2()
+
+        //Initialize Select2 Elements
+        $('.select2bs4').select2({
+            theme: 'bootstrap4'
+        })
+
+    })
+
+</script>
+
+
+
+
+<script>
+    $(document).ready(function () {
+        $('#DepId').on('change', function () {
+            var depId = $(this).val();
+            if (depId) {
+                // Ajax request to get amphures
+                $.ajax({
+                    url: '@Url.Action("GetPositionFromDatabaseByAjax", "Home")',
+                    type: 'POST',
+                    data: { depId: depId },
+                    success: function (data) {
+                        // Replace the content of Amphure dropdown
+                        $('#PosId').html(data);
+                        $('#PosId').prop('disabled', false);
+                    }
+                });
+            } else {
+                // If proId is empty, disable the Amphure dropdown
+                $('#PosId').prop('disabled', true);
+                // Optionally, you may clear the options of the Amphure dropdown
+                $('#PosId').html('<option value="0">Select an position...</option>');
+            }
+        });
+
+        // Add similar Ajax request for districts if needed
+    });
+
+
+
+    $(document).ready(function () {
+        $('#PosId').on('change', function () {
+            var posId = $(this).val();
+            if (posId) {
+                // Ajax request to get amphures
+                $.ajax({
+                    url: '@Url.Action("GetEmployeeFromDatabaseByAjax", "Home")',
+                    type: 'POST',
+                    data: { posId: posId },
+                    success: function (data) {
+                        // Replace the content of Amphure dropdown
+                        $('#EmpId').html(data);
+                        $('#EmpId').prop('disabled', false);
+                    }
+                });
+            } else {
+                // If proId is empty, disable the Amphure dropdown
+                $('#EmpId').prop('disabled', true);
+                // Optionally, you may clear the options of the Amphure dropdown
+                $('#EmpId').html('<option value="0">Select an employee...</option>');
+            }
+        });
+
+        // Add similar Ajax request for districts if needed
+    });
+
+
+
+    $(document).ready(function () {
+        $('#EmpId').on('change', function () {
+            var empId = $(this).val();
+            if (empId) {
+                // Ajax request to get amphures
+                $.ajax({
+                    url: '@Url.Action("GetEmpNumberFromDatabaseByAjax", "Home")',
+                    type: 'POST',
+                    data: { empId: empId },
+                    success: function (data) {
+                        // Replace the content of Amphure dropdown
+                        $('#Username').html(data);
+
+                    }
+                });
+            } else {
+                // If proId is empty, disable the Amphure dropdown
+                // Optionally, you may clear the options of the Amphure dropdown
+
+                $('#Username').html('<option value="0">Select an empnumber...</option>');
+            }
+        });
+
+        // Add similar Ajax request for districts if needed
+    });
+
+</script>
+
+
+
+
+
+
+
+

@@ -1,0 +1,8 @@
+﻿@model IEnumerable<Position>
+
+<option>----Position----</option>
+
+@foreach (var item in Model)
+{
+    <option value="@item.PosId">@item.PosName</option>
+}

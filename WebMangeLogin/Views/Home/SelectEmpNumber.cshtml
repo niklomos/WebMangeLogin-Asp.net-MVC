@@ -1,0 +1,7 @@
+﻿@model IEnumerable<Employee>
+
+
+@foreach (var item in Model)
+{
+    <option value="@item.EmpNumber">@item.EmpNumber</option>
+}

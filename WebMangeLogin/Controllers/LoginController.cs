@@ -1,0 +1,94 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using MySql.Data.MySqlClient;
+using System;
+using System.Data;
+using System.Text;
+using WebManageLogin.Models;
+
+namespace WebManageLogin.Controllers
+{
+    public class LoginController : Controller
+    {
+
+        private readonly ILogger<LoginController> _logger;
+        private readonly IConfiguration _configuration;
+
+        public LoginController(IConfiguration configuration, ILogger<LoginController> logger)
+        {
+            _logger = logger;
+            _configuration = configuration;
+        }
+        public IActionResult Login()
+        {
+            return View();
+        }
+
+
+        [HttpPost]
+        public IActionResult Login(Login login)
+        {
+            try
+            {
+                using (MySqlConnection con = new MySqlConnection(_configuration.GetConnectionString("connectionStr")))
+                {
+
+                    con.Open();
+
+                    var sqlquery = new StringBuilder();
+                    sqlquery.Append("SELECT  a.*,l.*,p.* FROM tb_access AS a LEFT JOIN tb_login AS l ON a.log_id = l.log_id  "); 
+                    sqlquery.Append(" LEFT JOIN tb_program AS p ON a.pg_id = p.pg_id  ");
+                    sqlquery.Append("WHERE  a.acc_status = '1' AND  l.Username = @Username AND l.Password = @Password AND a.pg_id = '1'  ");
+
+                    var cmd = new MySqlCommand(sqlquery.ToString(), con);
+                    cmd.Parameters.AddWithValue("@Username", login.Username);
+                    cmd.Parameters.AddWithValue("@Password", login.Password);
+                    cmd.Parameters.AddWithValue("@EmpId", login.EmpId);
+
+                    var reader = cmd.ExecuteReader();
+
+                    //if (reader.HasRows)
+                    if (reader.Read())
+                    {
+
+
+                        HttpContext.Response.Cookies.Append("LoggedInUsername_Login", login.Username);
+
+                        if (login.EmpId != null && login.EmpId != 0)
+                        {
+                            HttpContext.Response.Cookies.Append("LoggedInEmp_Id_Login", Convert.ToInt32(reader["emp_id"]).ToString());
+                            HttpContext.Response.Cookies.Append("LoggedInLog_Id_Login", Convert.ToInt32(reader["Log_id"]).ToString());
+                            return RedirectToAction("Summary", "Home");
+                        }
+                        else
+                        {
+                            HttpContext.Response.Cookies.Append("LoggedInLog_Id_Login", Convert.ToInt32(reader["Log_id"]).ToString());
+
+                            return RedirectToAction("Summary", "Home");
+                        }
+
+
+                        // รีไดเรกที่หน้า Home/Index
+                     
+                    }
+                    else
+                    {
+                        // รีเทิน หน้า login หากไม่พบข้อมูลผู้ใช้งาน
+                        ViewData["SweetAlert"] = "<script>Swal.fire('Invalid Login Attempt', 'Please check your username and password', 'error')</script>";
+                        return View();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // จัดการข้อผิดพลาด
+                _logger.LogError(ex, "Error during login");
+                ModelState.AddModelError(string.Empty, "An error occurred while processing your request.");
+                ViewData["ErrorMessage"] = "Invalid username or password";
+                return View();
+            }
+        }
+
+    }
+}

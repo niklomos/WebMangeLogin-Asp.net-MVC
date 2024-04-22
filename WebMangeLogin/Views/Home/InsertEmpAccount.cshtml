@@ -1,0 +1,204 @@
+﻿@model AccessModel
+<div class="container ">
+
+    <form asp-controller="Home" asp-action="InsertAccToDB" method="POST">
+        <div class="card card-dark mt-3">
+            <div class="card-header ">
+                <h2 class="  text-center">Insert Employee</h2>
+            </div>
+            <div class="card-body">
+                <div class=" d-flex justify-content-end ">
+                    <a class="btn btn-outline-dark me-2" style="border-width: 2px; " data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fa-solid fa-book-open-reader me-2"></i>Employee Detail</a>
+
+                </div>
+                <div class="mb-3 d-none">
+                    <label for="EmpId" class="form-label">EmpId</label>
+                    <input type="text" class="form-control" id="EmpId" name="EmpId" value="@Model.Employees.EmpId">
+                </div>
+                <div class="mb-3">
+                    <label for="Username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="Username" name="Username" value="@Model.Employees.EmpNumber" readonly>
+                </div>
+
+                <div class="mb-3">
+                    <label for="Password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="Password" name="Password" required>
+                </div>
+
+
+                <div class="input-group mb-3">
+                    <a class="text-primary toggle-form"><i class="fa-solid fa-circle-chevron-down me-1"></i></a>
+                </div>
+                <div class="toggleable ">
+                    <div class="card">
+                        <div class="card-body">
+                            <table class="table table-hover ">
+                                <thead class="table-dark ">
+                                    <tr class="text-center">
+                                        <th>ProgramName</th>
+                                        <th class="d-none">Confirm</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+
+
+                                <tbody>
+
+
+                                    @foreach (var item in Model.Programs)
+                                    {
+                                        <tr class="text-center">
+
+                                            <td>
+                                                @item.PgName
+                                            </td>
+                                            <td class="d-none">
+                                                <div class="form-check  ">
+                                                    <input class="form-check-input" type="checkbox" id="PgId" name="PgId[]" value="@item.PgId">
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="form-check form-switch ">
+                                                    <input class="form-check-input" type="checkbox" id="AccStatus" name="AccStatus[]" value="1">
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+
+                                </tbody>
+
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<!-- Modal --!>
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog ">
+            <div class="modal-content">
+                <div class="modal-header bg-dark">
+                    <h5 class="modal-title" id="exampleModalLabel">Employee Information </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text bg-dark text-light ip" id="basic-addon1"><b>Name</b></span>
+                        <input type="text" class="form-control ip" placeholder="" aria-label="" aria-describedby="basic-addon1" name="" value="@Model.Employees.EmpName" readonly>
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text bg-dark text-light ip" id="basic-addon1"><b>Email</b></span>
+                        <input type="text" class="form-control ip" placeholder="" aria-label="" aria-describedby="basic-addon1" name="" value="@Model.Employees.Email" readonly>
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text bg-dark text-light ip" id="basic-addon1"><b>Position</b></span>
+                        <input type="text" class="form-control ip" placeholder="" aria-label="" aria-describedby="basic-addon1" name="" value="@Model.Employees.PosName" readonly>
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text bg-dark text-light ip" id="basic-addon1"><b>Department</b></span>
+                        <input type="text" class="form-control ip" placeholder="" aria-label="" aria-describedby="basic-addon1" name="" value="@Model.Employees.DepName" readonly>
+                    </div>
+
+                </div>
+                </div>
+
+            </div>
+        </div>
+
+<!--Script-->
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+@* Start ajax get message from method  *@
+<script>
+    $(document).ready(function () {
+        $('form').submit(function (event) {
+            event.preventDefault();
+            var form = $(this);
+
+            $.ajax({
+                url: form.attr('action'),
+                method: form.attr('method'),
+                data: form.serialize(),
+                success: function (response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: response.message
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = '@Url.Action("ManageInsertAccount", "Home")' + '?page=' + '@Model.CurrentPage' + '&searchQuery=' + encodeURIComponent('@ViewBag.SearchQuery');
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.message
+                        });
+                    }
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while processing your request.'
+                    });
+                }
+            });
+        });
+    });
+</script>
+@* End ajax get message from method  *@
+
+
+
+
+
+@* Start check pgId auto *@
+<script>
+    $(document).ready(function () {
+        $('input[name="AccStatus[]"]').change(function () {
+            var isChecked = $(this).prop("checked");
+            var row = $(this).closest("tr");
+            var pgIdCheckbox = row.find('input[name="PgId[]"]');
+            pgIdCheckbox.prop("checked", isChecked);
+        });
+    });
+
+</script>
+@* End check pgId auto *@
+
+
+@* Start togger program*@
+<script>
+    $(document).ready(function () {
+        $(".toggle-form").click(function () {
+            $(".toggleable").toggle(500);
+        });
+    });
+</script>
+@* End togger program*@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

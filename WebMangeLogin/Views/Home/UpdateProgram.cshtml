@@ -1,0 +1,124 @@
+﻿@model AccessModel
+<div class="container">
+    <form asp-controller="Home" asp-action="UpdateProInDB" method="POST">
+        <div class="card card-dark mt-3">
+            <div class="card-header">
+                <h2 class="text-center">Edit Program</h2>
+
+            </div>
+            <div class="card-body ">
+                <div class="mb-3 d-none">
+                    <input type="text" class="form-control" id="PgId" name="PgId" value="@Model.ProgramModels.PgId" required>
+                </div>
+                <div class="mb-3 ">
+                    <input type="text" class="form-control" id="PgName" name="PgName" value="@Model.ProgramModels.PgName" required>
+                </div>
+
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="PgStatus" name="PgStatus" value="0" onchange="confirmDeleteEmployee()">
+                    <label class="form-check-label" for="flexSwitchCheckDefault">Inactive </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Update</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+
+<!--Script-->
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+@* Start Active before Updating *@
+<script>
+    $(document).ready(function () {
+        // ตัวแปรเพื่อตรวจสอบว่ามีการแก้ไขข้อมูลหรือไม่
+        var isModified = false;
+
+        // ตัวฟังก์ชันสำหรับตรวจจับการเปลี่ยนแปลงใน input fields
+        $('form :input').on('input', function () {
+            isModified = true;
+        });
+
+        // เมื่อฟอร์มถูกส่ง
+        $('form').submit(function (event) {
+            event.preventDefault();
+            var form = $(this);
+
+            // ตรวจสอบว่ามีการแก้ไขข้อมูลหรือไม่
+            if (!isModified) {
+                // ถ้าไม่มีการแก้ไข แสดงออลเลิร์ท
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Warning',
+                    text: 'No changes detected. Please make some changes before updating.'
+                });
+                return; // ไม่อนุญาตให้ฟอร์มถูกส่ง
+            }
+            $.ajax({
+                url: form.attr('action'),
+                method: form.attr('method'),
+                data: form.serialize(),
+                success: function (response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: response.message
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = '@Url.Action("ManageProgram", "Home")' + '?page=' + '@Model.CurrentPage' + '&searchQuery=' + decodeURIComponent('@ViewBag.SearchQuery');
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.message
+                        });
+                    }
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while processing your request.'
+                    });
+                }
+            });
+        });
+    });
+</script>
+@* End Active before Updating *@
+
+@* Start sweetalert Active Program *@
+<script>
+    // ฟังก์ชันที่ถูกเรียกเมื่อมีการเปลี่ยนแปลงใน checkbox
+    // function confirmDeleteEmployee() {
+    //     var checkBox = document.getElementById("PgStatus");
+    //     if (checkBox.checked) {
+    //         // แสดง SweetAlert แทน confirm
+    //         Swal.fire({
+    //             title: 'Do you want to inactive Program ?',
+    //             icon: 'question',
+    //             showCancelButton: true,
+    //             confirmButtonText: 'Yes',
+    //             cancelButtonText: 'Cancel'
+    //         }).then((result) => {
+    //             if (result.isConfirmed) {
+    //             } else {
+    //                 checkBox.checked = false;
+    //             }
+    //         });
+    //     }
+    // }
+</script>
+
+@* End sweetalert Active Program *@
+
+

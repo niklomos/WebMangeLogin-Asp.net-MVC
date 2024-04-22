@@ -1,0 +1,293 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - WebManageLogin</title>
+    @*  <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/WebManageEmployee.styles.css" asp-append-version="true" /> *@
+
+
+
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="~/plugins/fontawesome-free/css/all.min.css">
+    <!-- daterange picker -->
+    <link rel="stylesheet" href="~/plugins/daterangepicker/daterangepicker.css">
+    <!-- iCheck for checkboxes and radio inputs -->
+    <link rel="stylesheet" href="~/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <!-- Bootstrap Color Picker -->
+    <link rel="stylesheet" href="~/plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css">
+    <!-- Tempusdominus Bootstrap 4 -->
+    <link rel="stylesheet" href="~/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+    <!-- Select2 -->
+    <link rel="stylesheet" href="~/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="~/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+    <!-- Bootstrap4 Duallistbox -->
+    <link rel="stylesheet" href="~/plugins/bootstrap4-duallistbox/bootstrap-duallistbox.min.css">
+    <!-- BS Stepper -->
+    <link rel="stylesheet" href="~/plugins/bs-stepper/css/bs-stepper.min.css">
+    <!-- dropzonejs -->
+    <link rel="stylesheet" href="~/plugins/dropzone/min/dropzone.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="~/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+
+    <style>
+
+
+        /* ถ้าคุณต้องการให้เนื้อหาขยายตัวขึ้นเมื่อ Navbar ถูกตรงกับจอ ให้เพิ่ม padding-top เท่ากับความสูงของ Navbar */
+        html {
+            background-color: #f4f6f9;
+        }
+
+        .content-wrapper {
+            padding-top: 56px;
+        }
+    </style>
+
+</head>
+
+@functions {
+    public string IsActive(string controller, string action)
+    {
+        string currentController = ViewContext.RouteData.Values["Controller"].ToString();
+        string currentAction = ViewContext.RouteData.Values["Action"].ToString();
+
+        if ((currentController == controller) && (currentAction == action))
+        {
+            return "active ";
+        }
+
+        return "";
+    }
+    public string EmpPage()
+    {
+        return string.Join(" ", IsActive("Home", "Summary"),
+        IsActive("Home", "ManageInsertAccount"),
+        IsActive("Home", "InsertEmpAccount"),
+        IsActive("Home", "UpdateAccount"),
+        IsActive("Recycle", "ManageRecycleAccount"),
+        IsActive("Recycle", "UpdateRecycleAccount"));
+    }
+    public string AdmPage()
+    {
+        return string.Join(" ", IsActive("Home", "ManageAdminAccount"),
+        IsActive("Home", "InsertAdminAccount"),
+        IsActive("Home", "UpdateAdminAccount"),
+        IsActive("Recycle", "ManageRecycleAdminAccount"),
+        IsActive("Recycle", "UpdateRecycleAdminAccount"));
+    }
+    public string ProPage()
+    {
+        return string.Join(" ", IsActive("Home", "ManageProgram"),
+        IsActive("Home", "InsertProgram"),
+        IsActive("Home", "UpdateProgram"),
+        IsActive("Recycle", "ManageRecycleProgram"),
+        IsActive("Recycle", "UpdateRecycleProgram"));
+    }
+    public string ProfilePage()
+    {
+        return IsActive("Home", "Profile");
+
+    }
+}
+
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+
+        <header>
+            <div class="d-none">
+                @Context.Request.Cookies.TryGetValue("LoggedInUsername_login", out string? LoggedInUsername_Login);
+                @Context.Request.Cookies.TryGetValue("LoggedInLog_Id_login", out string? LoggedInLog_Id_Login);
+
+            </div>
+
+
+            <!-- Navbar -->
+            <nav class="main-header navbar navbar-expand  navbar-dark  fixed-top">
+                <!-- Left navbar links -->
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link text-light" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ml-auto me-2 ">
+                    <a asp-controller="Login" asp-action="Login" class="nav-link   text-light text-bold">
+                        <i class=" fa-solid fa-right-from-bracket "></i>
+                        Logout
+                    </a>
+                </ul>
+
+            </nav>
+        </header>
+        <!-- /.navbar -->
+        <!-- Main Sidebar Container -->
+        <aside class="main-sidebar sidebar-dark-primary elevation-4">
+            <!-- Brand Logo -->
+            <a asp-controller="Home" asp-action="Summary" class="brand-link text-decoration-none">
+                <img src="~/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+                <span class="brand-text font-weight-light font-weight-bold">ManageLogin</span>
+            </a>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Sidebar user panel (optional) -->
+                <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+                    <div class="image">
+                        <img src="~/dist/img/avatar4.png" class="img-circle elevation-2" alt="User Image">
+                    </div>
+                    <div class="info ">
+                        <a href="#" class="d-block  text-warning text-decoration-none">
+                            @if (!string.IsNullOrEmpty(LoggedInUsername_Login))
+                            {
+                                <span class="hidden-xs">
+                                    @LoggedInUsername_Login
+                                </span>
+                            }
+                        </a>
+                    </div>
+                </div>
+
+
+                <!-- Sidebar Menu -->
+                <nav class="mt-2">
+                    <ul class="nav nav-pills nav-sidebar flex-column " data-widget="treeview" role="menu" data-accordion="false">
+
+                        <li class="nav-item">
+                            <a asp-controller="Home" asp-action="Summary" class="nav-link @EmpPage()">
+                                <i class="nav-icon fa-solid fa-user-tie ml-1"></i>
+                                <p > Employee </p>
+                            </a>
+                        </li> 
+                        <li class="nav-item">
+                            <a asp-controller="Home" asp-action="manageAdminAccount" class="nav-link @AdmPage()">
+                                <i class="fa-solid fa-users-rectangle nav-icon ml-1"></i>
+                                <p> Non-Employee </p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a asp-controller="Home" asp-action="ManageProgram" class="nav-link  @ProPage()">
+                                <i class="fa-solid fa-bars-progress nav-icon ml-1"></i>
+                                <p>Program </p>
+                            </a>
+                        </li>
+                                
+                       
+                        <li class="nav-item">
+                            <a asp-controller="Home" asp-action="Profile" asp-route-id="@LoggedInLog_Id_Login" class="nav-link @ProfilePage()">
+                                <i class="fa-solid fa-user nav-icon  ml-1"></i>
+                                <p > Profile </p>
+                            </a>
+                        </li> 
+                    </ul>
+                </nav>
+            </div>
+
+        </aside>
+
+    </div>
+    <!-- ./wrapper -->
+
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+
+
+        <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+
+
+        @RenderBody()
+        <script>
+            document.getElementById("searchInput").addEventListener("keyup", function () {
+                var input, filter, table, tr, th, td, i, j, txtValue;
+                input = document.getElementById("searchInput");
+                filter = input.value.toUpperCase();
+                table = document.getElementsByTagName("table")[0];
+                tr = table.getElementsByTagName("tr");
+                for (i = 1; i < tr.length; i++) {
+                    var found = false; // เพิ่มตัวแปรเพื่อตรวจสอบว่าพบข้อมูลที่ต้องการค้นหาหรือไม่
+                    // วนลูปทุกคอลัมน์ในแถว
+                    for (j = 0; j < tr[i].getElementsByTagName("th").length; j++) {
+                        th = tr[i].getElementsByTagName("th")[j];
+                        if (th) {
+                            txtValue = th.textContent || th.innerText;
+                            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                                found = true; // หากพบข้อมูลที่ต้องการค้นหาในคอลัมน์ใดๆ ให้ตั้งค่า found เป็น true
+                                break; // ออกจากการวนลูปทันที เนื่องจากพบข้อมูลที่ต้องการค้นหาแล้ว
+                            }
+                        }
+                    }
+                    if (!found) {
+                        // ถ้าไม่พบในส่วนหัวของตาราง ให้ค้นหาในข้อมูลของแถว
+                        for (j = 0; j < tr[i].getElementsByTagName("td").length; j++) {
+                            td = tr[i].getElementsByTagName("td")[j];
+                            if (td) {
+                                txtValue = td.textContent || td.innerText;
+                                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                                    found = true; // หากพบข้อมูลที่ต้องการค้นหาในคอลัมน์ใดๆ ให้ตั้งค่า found เป็น true
+                                    break; // ออกจากการวนลูปทันที เนื่องจากพบข้อมูลที่ต้องการค้นหาแล้ว
+                                }
+                            }
+                        }
+                    }
+                    if (found) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            });
+        </script>
+
+
+        @*    <footer class="border-top footer text-muted">
+        <div class="container">
+        &copy; 2024 - WebManageEmployee - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+        </footer> *@
+    </div>
+    <!-- ./wrapper -->
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+    @*    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script> *@
+    @await RenderSectionAsync("Scripts", required: false)
+
+
+    <script src="~/plugins/jquery/jquery.min.js"></script>
+    <!-- Bootstrap 4 -->
+    <script src="~/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- Select2 -->
+    <script src="~/plugins/select2/js/select2.full.min.js"></script>
+    <!-- Bootstrap4 Duallistbox -->
+    <script src="~/plugins/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js"></script>
+    <!-- InputMask -->
+    <script src="~/plugins/moment/moment.min.js"></script>
+    <script src="~/plugins/inputmask/jquery.inputmask.min.js"></script>
+    <!-- date-range-picker -->
+    <script src="~/plugins/daterangepicker/daterangepicker.js"></script>
+    <!-- bootstrap color picker -->
+    <script src="~/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
+    <!-- Tempusdominus Bootstrap 4 -->
+    <script src="~/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
+    <!-- Bootstrap Switch -->
+    <script src="~/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
+    <!-- BS-Stepper -->
+    <script src="~/plugins/bs-stepper/js/bs-stepper.min.js"></script>
+    <!-- dropzonejs -->
+    <script src="~/plugins/dropzone/min/dropzone.min.js"></script>
+    <!-- AdminLTE App -->
+    <script src="~/dist/js/adminlte.min.js"></script>
+</body>
+</html>

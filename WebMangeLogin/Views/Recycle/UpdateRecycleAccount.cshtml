@@ -1,0 +1,225 @@
+﻿@model AccessModel
+<div class="container">
+    <form asp-controller="Recycle" asp-action="UpdateRecycleAccInDB" method="POST">
+
+        <div class="card card-dark mt-3">
+            <div class="card-header">
+                <h2 class="text-center">Recycle Employee</h2>
+            </div>
+
+
+            <div class="card-body">
+                <div class=" d-flex justify-content-end ">
+                    <a class="btn btn-outline-dark me-2" style="border-width: 2px; " data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fa-solid fa-book-open-reader me-2"></i>Employee Detail</a>
+
+                </div>
+                <div class="mb-3 d-none">
+                    <label for="Id" class="form-label">Id</label>
+                    <input type="text" class="form-control" id="LogId" name="LogId" value="@Model.Logins.LogId">
+                </div>
+                <div class="mb-3">
+                    <label for="Username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="Username" name="Username" value="@Model.Logins.Username" readonly>
+                </div>
+                <div class="mb-3">
+                    <label for="Password" class="form-label">Password</label>
+                    <input type="text" class="form-control" id="Password" name="Password" value="@Model.Logins.Password" readonly>
+                </div>
+
+                <div class="input-group mb-3">
+                    <a class="text-primary toggle-form"><i class="fa-solid fa-circle-chevron-down me-1"></i></a>
+                </div>
+                <div class="toggleable ">
+                <table class="table table-hover">
+                    <thead class="table-dark t">
+                        <tr class="text-center">
+                            <th>ProgramName</th>
+                            <th class="d-none">Confirm</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Programs)
+                        {
+                            <tr class="text-center">
+                                <td>
+                                    @item.PgName
+                                </td>
+                                <td class="d-none">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="PgId_@item.PgId" name="PgId[]" value="@item.PgId" disabled>
+                                    </div>
+                                </td>
+                                <td>
+                                    @foreach (var access in Model.Accesss.Where(a => a.PgId == item.PgId && a.LogId == Model.Logins.LogId))
+                                    {
+                                        <div class="form-check form-switch">
+                                            @{
+                                                string isChecked = access.AccStatus == "1" ? "checked" : "";
+                                            }
+                                            <input class="form-check-input acc-status-checkbox" type="checkbox" id="AccStatus_@access.AccId" name="AccStatus[]" value="1" disabled @isChecked>
+                                        </div>
+                                    }
+                                    @if (!Model.Accesss.Any(a => a.PgId == item.PgId && a.LogId == Model.Logins.LogId))
+                                    {
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input acc-status-checkbox" type="checkbox" id="AccStatus_@item.PgId" name="AccStatus[]" value="1" disabled>
+                                        </div>
+                                    }
+                                    @if (Model.Accesss.Any(a => a.PgId == item.PgId && a.LogId == Model.Logins.LogId))
+                                    {
+                                        <script>
+                                            $(document).ready(function () {
+                                                $('#PgId_@item.PgId').prop('checked', true);
+                                            });
+                                        </script>
+                                    }
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+                </div>
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="LogStatus" name="LogStatus" value="1">
+                    <label class="form-check-label" for="flexSwitchCheckDefault">Active </label>
+                </div>
+                <button type="submit" class="btn btn-primary mt-3">Restore</button>
+            </div>
+        </div>
+    </form>
+</div>
+<!-- Modal --!>
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog ">
+            <div class="modal-content">
+                <div class="modal-header bg-dark">
+                    <h5 class="modal-title" id="exampleModalLabel">Employee Information </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text bg-dark text-light ip" id="basic-addon1"><b>Name</b></span>
+                        <input type="text" class="form-control ip" placeholder="" aria-label="" aria-describedby="basic-addon1" name="" value="@Model.Logins.EmpName" readonly>
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text bg-dark text-light ip" id="basic-addon1"><b>Email</b></span>
+                        <input type="text" class="form-control ip" placeholder="" aria-label="" aria-describedby="basic-addon1" name="" value="@Model.Logins.Email" readonly>
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text bg-dark text-light ip" id="basic-addon1"><b>Position</b></span>
+                        <input type="text" class="form-control ip" placeholder="" aria-label="" aria-describedby="basic-addon1" name="" value="@Model.Logins.PosName" readonly>
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text bg-dark text-light ip" id="basic-addon1"><b>Department</b></span>
+                        <input type="text" class="form-control ip" placeholder="" aria-label="" aria-describedby="basic-addon1" name="" value="@Model.Logins.DepName" readonly>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- เรียกใช้ JavaScript หลังจาก HTML ถูกโหลดเสร็จสมบูรณ์ -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // เมื่อมีการเปลี่ยนแปลงใน checkbox ของ accStatus
+        $('.acc-status-checkbox').change(function () {
+            // ตรวจสอบว่า checkbox มีการเลือกหรือไม่
+            var isChecked = $(this).prop("checked");
+            // หาแถว (row) ที่มี checkbox ของ accStatus ที่เป็นตำแหน่งของ checkbox ที่เปลี่ยนแปลง
+            var row = $(this).closest("tr");
+            // หา checkbox ของ pgId ในแถวนั้น ๆ
+            var pgIdCheckbox = row.find('input[name="PgId[]"]');
+            // กำหนดสถานะ checked ของ checkbox ของ pgId ตามค่าของ checkbox ของ accStatus
+            pgIdCheckbox.prop("checked", isChecked);
+        });
+    });
+</script>
+
+
+@* Start check active before updat  &&  ajax get message from method  *@
+<script>
+    $(document).ready(function () {
+        // ตัวแปรเพื่อตรวจสอบว่ามีการแก้ไขข้อมูลหรือไม่
+        var isModified = false;
+
+        // ตัวฟังก์ชันสำหรับตรวจจับการเปลี่ยนแปลงใน input fields
+        $('form :input').on('input', function () {
+            isModified = true;
+        });
+
+        // เมื่อฟอร์มถูกส่ง
+        $('form').submit(function (event) {
+            event.preventDefault();
+            var form = $(this);
+
+            // ตรวจสอบว่ามีการแก้ไขข้อมูลหรือไม่
+            if (!isModified) {
+                // ถ้าไม่มีการแก้ไข แสดงออลเลิร์ท
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Warning',
+                    text: 'No changes detected. Please make some changes before updating.'
+                });
+                return; // ไม่อนุญาตให้ฟอร์มถูกส่ง
+            }
+
+            // ถ้ามีการแก้ไข ดำเนินการส่งข้อมูลด้วย AJAX
+            $.ajax({
+                url: form.attr('action'),
+                method: form.attr('method'),
+                data: form.serialize(),
+                success: function (response) {
+                    if (response.success) {
+                        // ถ้าสำเร็จ แสดงออลเลิร์ทเตือน
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: response.message
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = '@Url.Action("ManageRecycleAccount", "Recycle")' + '?page=' + '@Model.CurrentPage' + '&searchQuery=' + decodeURIComponent('@ViewBag.SearchQuery');
+                            }
+                        });
+                    } else {
+                        // ถ้าเกิดข้อผิดพลาด แสดงออลเลิร์ทเตือน
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.message
+                        });
+                    }
+                },
+                error: function () {
+                    // ถ้าเกิดข้อผิดพลาดในการส่งข้อมูล แสดงออลเลิร์ทเตือน
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while processing your request.'
+                    });
+                }
+            });
+        });
+    });
+
+</script>
+@* End  check active before updat  &&  ajax get message from method  *@
+
+
+@* Start togger program*@
+<script>
+    $(document).ready(function () {
+        $(".toggle-form").click(function () {
+            $(".toggleable").toggle(500);
+        });
+    });
+</script>
+@* End togger program*@
+
+
+
