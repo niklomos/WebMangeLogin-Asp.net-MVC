@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
+using MySqlX.XDevAPI;
 using System;
 using System.Data;
 using System.Text;
@@ -14,21 +15,28 @@ namespace WebManageLogin.Controllers
 
         private readonly ILogger<LoginController> _logger;
         private readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _contextAccessor;
 
-        public LoginController(IConfiguration configuration, ILogger<LoginController> logger)
+        public LoginController(ILogger<LoginController> logger, IConfiguration configuration, IHttpContextAccessor contextAccessor)
         {
             _logger = logger;
             _configuration = configuration;
+            _contextAccessor = contextAccessor;
         }
         public IActionResult Login()
         {
+            if (TempData.ContainsKey("SessionError"))
+            {
+                ViewData["SessionError"] = TempData["SessionError"].ToString();
+            }
             return View();
         }
 
 
         [HttpPost]
-        public IActionResult Login(Login login)
+        public IActionResult Login(Login login )
         {
+           
             try
             {
                 using (MySqlConnection con = new MySqlConnection(_configuration.GetConnectionString("connectionStr")))
@@ -51,9 +59,11 @@ namespace WebManageLogin.Controllers
                     //if (reader.HasRows)
                     if (reader.Read())
                     {
+                        var session = _contextAccessor.HttpContext.Session;
 
+                        session.SetString("LoggedInUsername_Login", reader["username"].ToString());
 
-                        HttpContext.Response.Cookies.Append("LoggedInUsername_Login", login.Username);
+                        //HttpContext.Response.Cookies.Append("LoggedInUsername_Login", login.Username);
 
                         if (login.EmpId != null && login.EmpId != 0)
                         {
@@ -87,6 +97,24 @@ namespace WebManageLogin.Controllers
                 ModelState.AddModelError(string.Empty, "An error occurred while processing your request.");
                 ViewData["ErrorMessage"] = "Invalid username or password";
                 return View();
+            }
+        }
+
+        public IActionResult Logout()
+        {
+            try
+            {
+                // ลบ session ทั้งหมด
+                _contextAccessor.HttpContext.Session.Clear();
+
+                // Redirect กลับไปยังหน้า login
+                return RedirectToAction("Login", "Login");
+            }
+            catch (Exception ex)
+            {
+                // กรณีเกิดข้อผิดพลาด
+                ViewBag.Error = "Error : " + ex.Message;
+                return View("Error"); // สามารถเลือกที่จะส่งไปยังหน้า error หรือหน้าอื่นที่เหมาะสม
             }
         }
 

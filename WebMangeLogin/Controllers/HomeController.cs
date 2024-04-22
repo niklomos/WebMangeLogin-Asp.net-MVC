@@ -2,22 +2,31 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MySql.Data.MySqlClient;
 using Mysqlx.Crud;
+using MySqlX.XDevAPI;
 using System;
 using System.Diagnostics;
 using WebManageLogin.Models;
 
 namespace WebManageLogin.Controllers
 {
+    [CheckSessionFilter]
     public class HomeController : Controller
     {
+        private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ILogger<HomeController> _logger;
         private readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _contextAccessor;
 
-        public HomeController(ILogger<HomeController> logger, IConfiguration configuration)
+
+        public HomeController(ILogger<HomeController> logger, IConfiguration configuration, IWebHostEnvironment webHostEnvironment, IHttpContextAccessor contextAccessor)
         {
             _logger = logger;
             _configuration = configuration;
+            _webHostEnvironment = webHostEnvironment;
+            _contextAccessor = contextAccessor;
+
         }
+
 
         public IActionResult Index()
         {
@@ -31,7 +40,8 @@ namespace WebManageLogin.Controllers
 
         public IActionResult Summary(string searchQuery, string searchProgram, int page = 1)
         {
-            try
+            
+                try
             {
 
                 int totalItems = GetTotalItemCount(searchQuery, searchProgram);
@@ -70,10 +80,13 @@ namespace WebManageLogin.Controllers
                 ModelState.AddModelError("", "??????????????: " + ex.Message);
                 return View();
             }
-        }
+                  
+            }
 
         public IActionResult ManageAdminAccount(string searchQuery, string searchProgram, int page = 1)
         {
+            
+
             try
             {
 

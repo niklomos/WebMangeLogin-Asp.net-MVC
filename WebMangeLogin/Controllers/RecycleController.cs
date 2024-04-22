@@ -6,6 +6,7 @@ using WebManageLogin.Models;
 
 namespace WebManageLogin.Controllers
 {
+    [CheckSessionFilter]
     public class RecycleController : Controller
     {
         private readonly ILogger<RecycleController> _logger;

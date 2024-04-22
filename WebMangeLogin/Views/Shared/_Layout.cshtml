@@ -101,8 +101,8 @@
 
         <header>
             <div class="d-none">
-                @Context.Request.Cookies.TryGetValue("LoggedInUsername_login", out string? LoggedInUsername_Login);
-                @Context.Request.Cookies.TryGetValue("LoggedInLog_Id_login", out string? LoggedInLog_Id_Login);
+@*                 @Context.Request.Cookies.TryGetValue("LoggedInUsername_login", out string? LoggedInUsername_Login);
+ *@                @Context.Request.Cookies.TryGetValue("LoggedInLog_Id_login", out string? LoggedInLog_Id_Login);
 
             </div>
 
@@ -116,7 +116,7 @@
                     </li>
                 </ul>
                 <ul class="navbar-nav ml-auto me-2 ">
-                    <a asp-controller="Login" asp-action="Login" class="nav-link   text-light text-bold">
+                    <a asp-controller="Login" asp-action="Logout" class="nav-link   text-light text-bold">
                         <i class=" fa-solid fa-right-from-bracket "></i>
                         Logout
                     </a>
@@ -142,10 +142,10 @@
                     </div>
                     <div class="info ">
                         <a href="#" class="d-block  text-warning text-decoration-none">
-                            @if (!string.IsNullOrEmpty(LoggedInUsername_Login))
+                            @if (!string.IsNullOrEmpty(Context.Session.GetString("LoggedInUsername_Login")))
                             {
                                 <span class="hidden-xs">
-                                    @LoggedInUsername_Login
+                                    @Context.Session.GetString("LoggedInUsername_Login")
                                 </span>
                             }
                         </a>
