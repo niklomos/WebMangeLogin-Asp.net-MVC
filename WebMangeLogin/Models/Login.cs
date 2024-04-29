@@ -15,6 +15,9 @@ namespace WebManageLogin.Models
         public string PosName { get; set; }
         public string DepName { get; set; }
 
+        public string RememberMe { get; set; }
+
+
         public Employee Employee { get; set; }
         public Position Position { get; set; }
         public Department Department { get; set; }

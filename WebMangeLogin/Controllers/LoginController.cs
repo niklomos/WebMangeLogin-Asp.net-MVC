@@ -25,10 +25,29 @@ namespace WebManageLogin.Controllers
         }
         public IActionResult Login()
         {
+          
+            if (Request.Cookies.TryGetValue("RememberMeUsernameLogin", out string rememberMeValueLogin))
+            {
+                ViewBag.RememberMeUsernameLogin = rememberMeValueLogin;
+            }
+            if (Request.Cookies.TryGetValue("RememberMePasswordLogin", out string rememberMeValue2Login))
+            {
+                ViewBag.RememberMePasswordLogin = rememberMeValue2Login;
+            }
+
+
             if (TempData.ContainsKey("SessionError"))
             {
                 ViewData["SessionError"] = TempData["SessionError"].ToString();
             }
+
+            if (ViewBag.RememberMeUsernameLogin != null)
+            {
+                var session = _contextAccessor.HttpContext.Session;
+                session.SetString("LoggedInUsername_Login", rememberMeValueLogin); 
+            }
+
+
             return View();
         }
 
@@ -59,13 +78,34 @@ namespace WebManageLogin.Controllers
                     //if (reader.HasRows)
                     if (reader.Read())
                     {
+                        if (login.RememberMe != null)
+                        {
+                            Response.Cookies.Append("RememberMeUsernameLogin", $"{login.Username}", new
+                                CookieOptions
+                            {
+                                Expires = DateTime.UtcNow.AddDays(1),
+                                HttpOnly = true,
+                                Secure = true,
+                                SameSite = SameSiteMode.None
+                            });
+
+
+                            Response.Cookies.Append("RememberMePasswordLogin", $"{login.Password}", new
+                                CookieOptions
+                            {
+                                Expires = DateTime.UtcNow.AddDays(1),
+                                HttpOnly = true,
+                                Secure = true,
+                                SameSite = SameSiteMode.None
+                            });
+                        }
                         var session = _contextAccessor.HttpContext.Session;
 
                         session.SetString("LoggedInUsername_Login", reader["username"].ToString());
 
                         //HttpContext.Response.Cookies.Append("LoggedInUsername_Login", login.Username);
 
-                        if (login.EmpId != null && login.EmpId != 0)
+                        if (login.EmpId != null && login.EmpId != 0 )
                         {
                             HttpContext.Response.Cookies.Append("LoggedInEmp_Id_Login", Convert.ToInt32(reader["emp_id"]).ToString());
                             HttpContext.Response.Cookies.Append("LoggedInLog_Id_Login", Convert.ToInt32(reader["Log_id"]).ToString());
@@ -106,6 +146,11 @@ namespace WebManageLogin.Controllers
             {
                 // ลบ session ทั้งหมด
                 _contextAccessor.HttpContext.Session.Clear();
+                Response.Cookies.Delete("RememberMeUsernameLogin");
+                Response.Cookies.Delete("RememberMePasswordLogin");
+                Response.Cookies.Delete("LoggedInLog_Id_Login");
+                Response.Cookies.Delete("LoggedInEmp_Id_Login");
+
 
                 // Redirect กลับไปยังหน้า login
                 return RedirectToAction("Login", "Login");
